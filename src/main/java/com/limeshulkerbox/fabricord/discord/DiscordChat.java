@@ -8,13 +8,15 @@ import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.minecraft.command.CommandRegistryAccess;
+import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.server.Main;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.CommandOutput;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.registry.DynamicRegistryManager;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
@@ -42,7 +44,7 @@ public class DiscordChat extends ListenerAdapter {
     }
 
     public static void runMinecraftCommand(@NotNull MessageReceivedEvent event) {
-        CommandManager command = new CommandManager(CommandManager.RegistrationEnvironment.DEDICATED, new CommandRegistryAccess(DynamicRegistryManager.BUILTIN.get()));
+        CommandManager command = API.getServerVariable().getCommandManager();
         try {
             //Attempt to send command
             ServerCommandSource cmdsrc = new ServerCommandSource(new CommandOutput() {
