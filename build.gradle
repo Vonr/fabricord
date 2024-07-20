@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '0.12-SNAPSHOT'
+	id 'fabric-loom' version '1.6-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -13,7 +13,7 @@ repositories {
 	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
 	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 	// for more information about repositories.
-	maven { url = "https://jitpack.io"}
+	maven { url = "https://jitpack.io" }
 
 	mavenCentral() // for transitive dependencies
 	maven {
@@ -23,19 +23,20 @@ repositories {
 }
 
 dependencies {
+	modImplementation("net.fabricmc:fabric-language-kotlin:1.11.0+kotlin.2.0.0")
 	implementation 'junit:junit:4.13.2'
-	include implementation("club.minnced:discord-webhooks:0.7.5")
-	include implementation('org.slf4j:slf4j-api:1.7.32')
-	include implementation("com.squareup.okio:okio:2.10.0")
-	include implementation('com.squareup.okhttp3:okhttp:3.13.0')
+	include implementation("club.minnced:discord-webhooks:0.8.4")
+	include implementation('org.slf4j:slf4j-api:2.0.13')
+	include implementation("com.squareup.okio:okio:3.9.0")
+	include implementation('com.squareup.okhttp3:okhttp:4.12.0')
 	include implementation('org.apache.commons:commons-collections4:4.4')
 	include implementation('com.neovisionaries:nv-websocket-client:2.14')
 	include implementation('net.sf.trove4j:trove4j:3.0.3')
-	include implementation('com.fasterxml.jackson.core:jackson-databind:2.13.1')
-	include implementation('com.fasterxml.jackson.core:jackson-core:2.13.1')
-	include implementation('com.fasterxml.jackson.core:jackson-annotations:2.13.1')
-	include implementation("blue.endless:jankson:1.2.0")
-	include implementation("org.json:json:20220320")
+	include implementation('com.fasterxml.jackson.core:jackson-databind:2.17.1')
+	include implementation('com.fasterxml.jackson.core:jackson-core:2.17.1')
+	include implementation('com.fasterxml.jackson.core:jackson-annotations:2.17.1')
+	include implementation("blue.endless:jankson:1.2.3")
+	include implementation("org.json:json:20240303")
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
@@ -47,11 +48,11 @@ dependencies {
 	}
 
 	//lombok, used for getters and setters
-	compileOnly 'org.projectlombok:lombok:1.18.24'
-	annotationProcessor 'org.projectlombok:lombok:1.18.24'
+	compileOnly 'org.projectlombok:lombok:1.18.32'
+	annotationProcessor 'org.projectlombok:lombok:1.18.32'
 
-	testCompileOnly 'org.projectlombok:lombok:1.18.24'
-	testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
+	testCompileOnly 'org.projectlombok:lombok:1.18.32'
+	testAnnotationProcessor 'org.projectlombok:lombok:1.18.32'
 }
 
 processResources {
@@ -64,7 +65,7 @@ processResources {
 
 tasks.withType(JavaCompile).configureEach {
 	it.options.encoding = "UTF-8"
-	it.options.release = 17
+	it.options.release = 21
 }
 
 java {

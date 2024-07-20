@@ -3,23 +3,20 @@ package com.limeshulkerbox.fabricord.discord;
 import com.limeshulkerbox.fabricord.api.v1.API;
 import com.limeshulkerbox.fabricord.minecraft.ServerInitializer;
 import com.limeshulkerbox.fabricord.minecraft.events.GetServerPromptEvents;
+import lombok.NonNull;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.minecraft.command.CommandRegistryAccess;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.server.Main;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.CommandOutput;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
-import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -43,7 +40,7 @@ public class DiscordChat extends ListenerAdapter {
         return false;
     }
 
-    public static void runMinecraftCommand(@NotNull MessageReceivedEvent event) {
+    public static void runMinecraftCommand(@NonNull MessageReceivedEvent event) {
         CommandManager command = API.getServerVariable().getCommandManager();
         try {
             //Attempt to send command
@@ -78,7 +75,7 @@ public class DiscordChat extends ListenerAdapter {
         } catch (Exception e) {
             e.printStackTrace();
         }
-  }
+    }
 
     //Prompts
     public static void serverStartingMethod() {
@@ -162,12 +159,12 @@ public class DiscordChat extends ListenerAdapter {
     }
 
     @Override
-    public void onReady(@Nonnull ReadyEvent event) {
+    public void onReady(@NonNull ReadyEvent event) {
         ServerInitializer.jdaReady = true;
     }
 
     @Override
-    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
+    public void onMessageReceived(@NonNull MessageReceivedEvent event) {
         super.onMessageReceived(event);
 
         //Makes sure the sender is not a bot
@@ -177,6 +174,17 @@ public class DiscordChat extends ListenerAdapter {
         content = event.getMessage().getContentRaw();
 
         //See if the message is a command
+        if (content.equals("!playerlist")) {
+            StringBuilder sb = new StringBuilder("[Playerlist] ");
+            List<ServerPlayerEntity> players = API.getServerVariable().getPlayerManager().getPlayerList();
+            sb.append('(').append(players.size()).append('/').append(API.getServerVariable().getMaxPlayerCount()).append("): ");
+            for (int i = 0, d = players.size(); i < d; ++i) {
+                if (i != 0) sb.append(", ");
+                sb.append(players.get(i).getName());
+            }
+            API.sendMessage(sb.toString(), false, true, false);
+            return;
+        }
         if (content.startsWith("/")) {
             if (!isCorrectChannel(event, false)) return;
             if (didFabricordCommandRun(event)) return;
@@ -196,8 +204,10 @@ public class DiscordChat extends ListenerAdapter {
 
     private boolean hasAccess(MessageReceivedEvent event) {
         if (config.getCommandsAccessRoleID() == null || config.getCommandsAccessRoleID().equals("")) return false;
-        if (Objects.requireNonNull(event.getMember()).getRoles().contains(event.getGuild().getRoleById(config.getCommandsAccessRoleID()))) return true;
-        if (config.isSendWrongChannelMessage()) event.getChannel().sendMessage("Sorry <@" + event.getMember().getId() + "> you don't have access to the console. If you believe you should have access, contact an Admin of this discord server.").queue();
+        if (Objects.requireNonNull(event.getMember()).getRoles().contains(event.getGuild().getRoleById(config.getCommandsAccessRoleID())))
+            return true;
+        if (config.isSendWrongChannelMessage())
+            event.getChannel().sendMessage("Sorry <@" + event.getMember().getId() + "> you don't have access to the console. If you believe you should have access, contact an Admin of this discord server.").queue();
         return false;
     }
 

@@ -82,7 +82,7 @@ public class ServerInitializer implements DedicatedServerModInitializer {
         if (ticksPassed <= 40)
             return;
         ticksPassed = 0;
-        double avgTickTime = server.lastTickLengths[99] * 1.0E-6D;
+        double avgTickTime = server.getAverageTickTime();
         tps = Math.min(1000.0D / avgTickTime, 20.0D);
     }
 
@@ -92,11 +92,7 @@ public class ServerInitializer implements DedicatedServerModInitializer {
 
     public static void startDiscordBot() {
         //Make the Discord bot come alive
-        try {
-            api = JDABuilder.createDefault(config.getBotToken()).addEventListeners(new DiscordChat()).build();
-        } catch (LoginException e) {
-            e.printStackTrace();
-        }
+        api = JDABuilder.createDefault(config.getBotToken()).addEventListeners(new DiscordChat()).build();
         canUseBot = true;
     }
 
@@ -138,15 +134,15 @@ public class ServerInitializer implements DedicatedServerModInitializer {
 
                     .executes((context -> {
                         API.reloadConfig(false);
-                        context.getSource().sendFeedback(Text.of("Successfully updated the config!"), true);
+                        context.getSource().sendFeedback(() -> Text.of("Successfully updated the config!"), true);
                         return 1;
                     }))
 
                     .then(CommandManager.argument("do_restart_discord_bot", BoolArgumentType.bool()).executes((context -> {
                                 if (BoolArgumentType.getBool(context, "do_restart_discord_bot"))
-                                    context.getSource().sendFeedback(Text.of("Attempting to reload the config and discord bot..."), true);
+                                    context.getSource().sendFeedback(() -> Text.of("Attempting to reload the config and discord bot..."), true);
                                 API.reloadConfig(BoolArgumentType.getBool(context, "do_restart_discord_bot"));
-                                context.getSource().sendFeedback(Text.of("Successfully updated the config!"), true);
+                                context.getSource().sendFeedback(() -> Text.of("Successfully updated the config!"), true);
                                 return 1;
                             }))
                     ))));
